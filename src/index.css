@@ -30,3 +30,9 @@ body {
   .btn-danger { @apply btn bg-red-600 text-white hover:bg-red-700; }
   .label { @apply mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400; }
 }
+
+@media print {
+  aside, header, nav, .print\:hidden { display: none !important; }
+  main { overflow: visible !important; padding: 0 !important; }
+  body { background: #fff !important; }
+}

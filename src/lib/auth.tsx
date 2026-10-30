@@ -23,6 +23,10 @@ interface AuthCtx {
   loading: boolean
   signIn: (identifier: string, password: string) => Promise<void>
   signOut: () => Promise<void>
+  signUp: (email: string, password: string, fullName: string) => Promise<string>
+  sendReset: (email: string) => Promise<void>
+  recovery: boolean
+  clearRecovery: () => void
   refreshProfile: () => Promise<void>
 }
 
@@ -32,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [recovery, setRecovery] = useState(false)
 
   async function loadProfile(userId: string | undefined) {
     if (!userId) {
@@ -48,7 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await loadProfile(data.session?.user.id)
       setLoading(false)
     })
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((e, s) => {
+      if (e === 'PASSWORD_RECOVERY') setRecovery(true)
       setSession(s)
       loadProfile(s?.user.id)
     })
@@ -66,13 +72,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw new Error('Username or password is wrong.')
   }
 
+  async function signUp(email: string, password: string, fullName: string) {
+    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { full_name: fullName.trim(), username: fullName.trim() } } })
+    if (error) throw new Error(/not been invited/i.test(error.message) ? 'This email has not been invited. Ask the Admin to invite you first.' : error.message)
+    return data.session ? 'signed-in' : 'confirm-email'
+  }
+
+  async function sendReset(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin })
+    if (error) throw new Error(error.message)
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
 
   return (
     <Ctx.Provider
-      value={{ session, profile, loading, signIn, signOut, refreshProfile: () => loadProfile(session?.user.id) }}
+      value={{ session, profile, loading, signIn, signOut, signUp, sendReset, recovery, clearRecovery: () => setRecovery(false), refreshProfile: () => loadProfile(session?.user.id) }}
     >
       {children}
     </Ctx.Provider>
