@@ -4,6 +4,9 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import ComingSoon from './pages/ComingSoon'
+import Clients from './pages/Clients'
+import Projects from './pages/Projects'
+import Tasks from './pages/Tasks'
 import { Spinner } from './components/ui'
 
 export default function App() {
@@ -21,9 +24,9 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
-        <Route path="clients/*" element={<ComingSoon title="Clients" />} />
-        <Route path="projects/*" element={<ComingSoon title="Projects" />} />
-        <Route path="tasks/*" element={<ComingSoon title="Tasks" />} />
+        <Route path="clients/*" element={<Clients />} />
+        <Route path="projects/*" element={<Projects />} />
+        <Route path="tasks/*" element={<Tasks />} />
         <Route path="employees/*" element={<ComingSoon title="Employees" />} />
         <Route path="reports/*" element={<ComingSoon title="Daily reports" />} />
         <Route path="tenders/*" element={<ComingSoon title="Tenders" />} />

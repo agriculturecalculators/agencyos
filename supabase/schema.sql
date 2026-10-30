@@ -115,6 +115,7 @@ create table if not exists documents (
   client_id uuid references clients(id) on delete cascade,
   project_id uuid references projects(id) on delete cascade,
   tender_id uuid,
+  task_id uuid references tasks(id) on delete cascade,
   name text not null,
   path text not null,
   uploaded_by uuid references profiles(id),
@@ -376,9 +377,12 @@ create policy time_entries_write on time_entries for all to authenticated
 -- documents
 create policy documents_read on documents for select to authenticated
   using ((project_id is not null and public.can_see_project(project_id))
-      or (client_id is not null and public.can_see_client(client_id)) or public.is_manager_up());
-create policy documents_write on documents for all to authenticated
-  using (public.is_lead_up()) with check (public.is_lead_up());
+      or (client_id is not null and public.can_see_client(client_id))
+      or (task_id is not null and exists (select 1 from tasks t where t.id = task_id))
+      or public.is_manager_up());
+create policy documents_insert on documents for insert to authenticated with check (uploaded_by = auth.uid());
+create policy documents_delete on documents for delete to authenticated
+  using (uploaded_by = auth.uid() or public.is_lead_up());
 
 -- daily reports: your own; leads and managers review
 create policy reports_read on daily_reports for select to authenticated
