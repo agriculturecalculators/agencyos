@@ -7,6 +7,11 @@ import ComingSoon from './pages/ComingSoon'
 import Clients from './pages/Clients'
 import Projects from './pages/Projects'
 import Tasks from './pages/Tasks'
+import Employees from './pages/Employees'
+import Reports from './pages/Reports'
+import Tenders from './pages/Tenders'
+import Finance from './pages/Finance'
+import { Guard } from './components/Layout'
 import { Spinner } from './components/ui'
 
 export default function App() {
@@ -27,10 +32,10 @@ export default function App() {
         <Route path="clients/*" element={<Clients />} />
         <Route path="projects/*" element={<Projects />} />
         <Route path="tasks/*" element={<Tasks />} />
-        <Route path="employees/*" element={<ComingSoon title="Employees" />} />
-        <Route path="reports/*" element={<ComingSoon title="Daily reports" />} />
-        <Route path="tenders/*" element={<ComingSoon title="Tenders" />} />
-        <Route path="finance/*" element={<ComingSoon title="Finance" />} />
+        <Route path="employees/*" element={<Guard roles={['admin','manager','team_leader']}><Employees /></Guard>} />
+        <Route path="reports/*" element={<Reports />} />
+        <Route path="tenders/*" element={<Guard roles={['admin','manager','team_leader']}><Tenders /></Guard>} />
+        <Route path="finance/*" element={<Guard roles={['admin','manager']}><Finance /></Guard>} />
         <Route path="analytics/*" element={<ComingSoon title="Analytics" />} />
         <Route path="calendar/*" element={<ComingSoon title="Calendar" />} />
         <Route path="notifications/*" element={<ComingSoon title="Notifications" />} />

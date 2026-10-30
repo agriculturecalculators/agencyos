@@ -379,6 +379,7 @@ create policy documents_read on documents for select to authenticated
   using ((project_id is not null and public.can_see_project(project_id))
       or (client_id is not null and public.can_see_client(client_id))
       or (task_id is not null and exists (select 1 from tasks t where t.id = task_id))
+      or (tender_id is not null and public.is_lead_up())
       or public.is_manager_up());
 create policy documents_insert on documents for insert to authenticated with check (uploaded_by = auth.uid());
 create policy documents_delete on documents for delete to authenticated
